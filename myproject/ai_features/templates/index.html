@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monkey Island Chatbot</title>
+    <style>
+        body {
+            background-color: #f0e68c; /* Light yellow background */
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #3b2a1e; /* Dark brown text color */
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #ffcc00; /* Bright yellow header */
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff; /* White background for chat */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .message-log {
+            height: 300px; /* Fixed height for message log */
+            overflow-y: auto; /* Scrollable area */
+            border: 1px solid #ccc; /* Border for message log */
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9; /* Light gray background for messages */
+        }
+        .user-input {
+            display: flex;
+        }
+        .user-input input[type="text"] {
+            flex-grow: 1; /* Take available space */
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc; /* Border for input field */
+        }
+        .user-input button {
+            padding: 10px;
+            margin-left: 10px;
+            background-color: #3b2a1e; /* Dark brown button */
+            color: white;
+            border-radius: 5px;
+            border: none; /* No border for button */
+        }
+        .user-input button:hover {
+            background-color: #5a3c28; /* Lighter brown on hover */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Monkey Island Chatbot</h1>
+</header>
+
+<div class="chat-container">
+    <div class="message-log" id="message-log">
+        <!-- Messages will be displayed here -->
+    </div>
+
+    <div class="user-input">
+        <input type="text" id="user-message" placeholder="Type your message here..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    function appendMessage(sender, message) {
+        const messageLog = document.getElementById('message-log');
+        const newMessage = document.createElement('div');
+        newMessage.textContent = `${sender}: ${message}`;
+        messageLog.appendChild(newMessage);
+        
+        // Scroll to the bottom of the message log
+        messageLog.scrollTop = messageLog.scrollHeight;
+    }
+
+    function sendMessage() {
+        const userInput = document.getElementById('user-message');
+        const userMessage = userInput.value.trim();
+        
+        if (userMessage) {
+            appendMessage('You', userMessage); // Display user's message
+
+            // Send the user's message to the server
+            fetch(`/ai/chat/?message=${encodeURIComponent(userMessage)}`)
+                .then(response => response.json())
+                .then(data => {
+                    appendMessage('Pirate', data.response); // Display AI's response
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    appendMessage('Pirate', "Oops! Something went wrong.");
+                });
+
+            userInput.value = ''; // Clear the input field
+        }
+    }
+</script>
+
+</body>
+</html>
